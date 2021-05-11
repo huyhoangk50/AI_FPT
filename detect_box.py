@@ -9,12 +9,12 @@ import numpy as np
 import libs.yolo_darknet.darknet as darknet
 from libs.yolo_darknet.yolov4 import predict_yolov4 # format tlwh
 
-NETWORK, CLASS_NAMES, CLASS_COLORS = darknet.load_network(
-    "model/yolo_model/yolov4-custom.cfg",
-    "model/yolo_model/obj.data",
-    "model/yolo_model/yolov4-custom.weights",
-    batch_size=8
-)
+# NETWORK, CLASS_NAMES, CLASS_COLORS = darknet.load_network(
+#     "model/yolo_model/yolov4-custom.cfg",
+#     "model/yolo_model/obj.data",
+#     "model/yolo_model/yolov4-custom.weights",
+#     batch_size=8
+# )
 
 def detect_boxes(image, NETWORK, CLASS_NAMES, CLASS_COLORS):
     list_bboxes, list_scores, list_labels = predict_yolov4(image, NETWORK, CLASS_NAMES, CLASS_COLORS)
