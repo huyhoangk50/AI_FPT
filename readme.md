@@ -1,7 +1,7 @@
 # Hackathon
 ## 1. Download model
 ```
-    /bin/bash download_model.sh
+/bin/bash download_model.sh
 ```
 
 ## Run pipeline
