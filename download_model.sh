@@ -2,7 +2,7 @@ pip3 install gdown
 mkdir model && cd model &&\
 mkdir unet && cd unet &&\
 # model unet
-gdown --id 1QXEJbIKOoKdHeffpZuPoFndK14OdH9zf && cd .. && \
+gdown --id 1x-Vl2ul5NhR77EeJnAL9XKi9elqMPHTE && cd .. && \
 mkdir yolo_model && cd yolo_model &&\
 # obj.data
 gdown --id 1imcijco7Yqmi3fFWANdFKkN5y5-UoQem && \

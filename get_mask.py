@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
+import time
 
 from libs.unet.unet import UNet
 from libs.unet.utils.data_vis import plot_img_and_mask
@@ -56,7 +57,9 @@ if __name__ == '__main__':
 
     image = Image.open('images/demo.jpg')
 
+    start = time.time()
     mask = predict_img(image, NET, DEVICE)
+    print("time: ", time.time()-start)
 
     # save mask
     result = mask_to_image(mask)

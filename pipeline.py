@@ -117,6 +117,9 @@ if __name__ == '__main__':
     video_path = os.getenv("VIDEO_PATH")
     if not video_path:
         raise 'must set VIDEO_PATH'
+    output_video = os.getenv("OUTPUT_VIDEO")
+    if not output_video:
+        raise 'must set OUTPUT_VIDEO'
 
     CFG = ConfigParser()
     CFG.read("configs/config.ini")
@@ -139,6 +142,12 @@ if __name__ == '__main__':
     SORT_TRACKER = Sort()
 
     cap = cv2.VideoCapture(video_path)
+    frame_width = int(cap.get(3))
+    frame_height = int(cap.get(4))
+    
+    size = (frame_width, frame_height)
+    out = cv2.VideoWriter(output_video, -1, 20.0, size)
+
     while True :
         _, frame = cap.read()
 
@@ -155,9 +164,12 @@ if __name__ == '__main__':
             track_bbs_ids = SORT_TRACKER.update(list_bboxes)
 
             for track in track_bbs_ids:
-                frame = draw_bbox_maxmin(img, track[:4], True, int(track[4]))
+                frame = draw_bbox_maxmin(frame, track[:4], True, int(track[4]))
         
             print("track: ", track_bbs_ids)
+        
+        # write the flipped frame
+        out.write(frame)
 
         # draw
         # for bbox in list_bboxes:
