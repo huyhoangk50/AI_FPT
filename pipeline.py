@@ -146,30 +146,34 @@ if __name__ == '__main__':
     frame_height = int(cap.get(4))
     
     size = (frame_width, frame_height)
-    out = cv2.VideoWriter(output_video, -1, 20.0, size)
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    out = cv2.VideoWriter(output_video, fourcc, 20.0, size)
 
     while True :
         _, frame = cap.read()
 
-        # convert pil image
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        im_pil = Image.fromarray(img)
-        # main process
-        mask_polygon = get_mask_polygon(im_pil, NET, DEVICE)
-        list_bboxes, list_scores, list_labels = detect_boxes(frame, NETWORK, CLASS_NAMES, CLASS_COLORS, mask_polygon)
+        try:
+            # convert pil image
+            img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            im_pil = Image.fromarray(img)
+            # main process
+            mask_polygon = get_mask_polygon(im_pil, NET, DEVICE)
+            list_bboxes, list_scores, list_labels = detect_boxes(frame, NETWORK, CLASS_NAMES, CLASS_COLORS, mask_polygon)
 
-        if len(list_bboxes) > 0:
-            list_bboxes = np.array(list_bboxes)
-            # update SORT
-            track_bbs_ids = SORT_TRACKER.update(list_bboxes)
+            if len(list_bboxes) > 0:
+                list_bboxes = np.array(list_bboxes)
+                # update SORT
+                track_bbs_ids = SORT_TRACKER.update(list_bboxes)
 
-            for track in track_bbs_ids:
-                frame = draw_bbox_maxmin(frame, track[:4], True, int(track[4]))
-        
-            print("track: ", track_bbs_ids)
-        
-        # write the flipped frame
-        out.write(frame)
+                for track in track_bbs_ids:
+                    frame = draw_bbox_maxmin(frame, track[:4], True, int(track[4]))
+            
+                print("track: ", track_bbs_ids)
+            
+            # write the flipped frame
+            out.write(frame)
+        except:
+            pass
 
         # draw
         # for bbox in list_bboxes:
