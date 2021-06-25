@@ -176,7 +176,7 @@ if __name__ == '__main__':
             print("Reading frame: " + str(frameCount) + " in total: " + str(frameNum))
             frameCount += 1
             try:
-            convert pil image
+            # convert pil image
                 img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 im_pil = Image.fromarray(img)
                 # main process
