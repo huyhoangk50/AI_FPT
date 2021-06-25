@@ -12,18 +12,18 @@ from get_mask import predict_img, mask_to_image
 from libs.unet.unet import UNet
 from configparser import ConfigParser
 from sort import *
+import os
 
 def make_polygon_segment_zone(output_image):
     image_gray = cv2.cvtColor(output_image, cv2.COLOR_BGR2GRAY)
     edged = cv2.Canny(image_gray, 30, 200)
     ret, thresh = cv2.threshold(image_gray, 127, 255, 0)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    hull = []
+    hull = np.array([])
 
     for i in range(len(contours)):
         # creating convex hull object for each contour
-        hull.append(cv2.convexHull(contours[i], False))
-
+        hull = np.append(hull, np.array(cv2.convexHull(contours[i], False)))
     hull = np.array(hull, np.int32)
     hull = hull.reshape((-1, 1, 2))
 
@@ -117,6 +117,13 @@ if __name__ == '__main__':
     video_path = os.getenv("VIDEO_PATH")
     if not video_path:
         raise 'must set VIDEO_PATH'
+    listVideos= []
+    for file in os.listdir(video_path):
+        if file.endswith(".MP4") or file.endswith(".mp4"):
+            listVideos.append([file, os.path.join(video_path, file)])
+    if len(listVideos) == 0:
+        raise 'Empty MP4 file in VIDEO_PATH'
+    print ("List of all files: ", listVideos)
     output_video = os.getenv("OUTPUT_VIDEO")
     if not output_video:
         raise 'must set OUTPUT_VIDEO'
@@ -141,18 +148,34 @@ if __name__ == '__main__':
     # Sort 
     SORT_TRACKER = Sort()
 
-    cap = cv2.VideoCapture(video_path)
-    frame_width = int(cap.get(3))
-    frame_height = int(cap.get(4))
-    
-    size = (frame_width, frame_height)
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(output_video, fourcc, 20.0, size)
 
-    while True :
-        _, frame = cap.read()
-
-        try:
+    for videoCount in range(len(listVideos)):
+        print ("Video: " + str(videoCount) + "th in total: " + str(len(listVideos)))
+        record = listVideos[videoCount]
+        videoName = record[0]
+        videoPath = record[1]
+        outVideoPath = output_video + videoName[0: -3] + "avi"
+        print("outVideoPath: ", outVideoPath)
+        frameCount = 0
+        # exit()
+        cap = cv2.VideoCapture(videoPath)
+        frame_width = int(cap.get(3))
+        frame_height = int(cap.get(4))
+        fps = cap.get(5)
+        frameNum = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        # outputVideo = 
+        size = (frame_width, frame_height)
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter(outVideoPath, fourcc, fps, size)
+        
+        while True :
+            _, frame = cap.read()
+            if frame is None:
+                print ("End of video")
+                break
+            print("Reading frame: " + str(frameCount) + " in total: " + str(frameNum))
+            frameCount += 1
+            # try:
             # convert pil image
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             im_pil = Image.fromarray(img)
@@ -168,21 +191,20 @@ if __name__ == '__main__':
                 for track in track_bbs_ids:
                     frame = draw_bbox_maxmin(frame, track[:4], True, int(track[4]))
             
-                print("track: ", track_bbs_ids)
-            
             # write the flipped frame
             out.write(frame)
-        except:
-            pass
+            # except:
+            #     print("error occurs")
+            #     pass
 
-        # draw
-        # for bbox in list_bboxes:
-        #     frame = cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 255), 1)
-        
-        # frame = draw_polygon(frame, mask_polygon)
-        # cv2.imwrite("output.jpg", frame)
-        
-    cap.stop()
-    cv2.destroyAllWindows()  
+            # draw
+            # for bbox in list_bboxes:
+            #     frame = cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 255, 255), 1)
+            
+            # frame = draw_polygon(frame, mask_polygon)
+            # cv2.imwrite("output.jpg", frame)
+            
+        cap.stop()
+        cv2.destroyAllWindows()  
 
     
