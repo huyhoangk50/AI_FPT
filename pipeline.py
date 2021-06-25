@@ -119,7 +119,7 @@ if __name__ == '__main__':
         raise 'must set VIDEO_PATH'
     listVideos= []
     for file in os.listdir(video_path):
-        if file.endswith(".MP4") or file.endswith(".mp4"):
+        if file.endswith(".MP4") or file.endswith(".mp4") or file.endswith(".mov"):
             listVideos.append([file, os.path.join(video_path, file)])
     if len(listVideos) == 0:
         raise 'Empty MP4 file in VIDEO_PATH'
